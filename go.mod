@@ -4,6 +4,8 @@ go 1.21.5
 
 require cloud.google.com/go/secretmanager v1.12.0
 
+require github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
+
 require (
 	cloud.google.com/go/compute v1.25.1 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
@@ -16,6 +18,7 @@ require (
 	github.com/google/s2a-go v0.1.7 // indirect
 	github.com/googleapis/enterprise-certificate-proxy v0.3.2 // indirect
 	github.com/googleapis/gax-go/v2 v2.12.2 // indirect
+	github.com/urfave/cli/v3 v3.0.0-alpha9
 	go.opencensus.io v0.24.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.49.0 // indirect
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.49.0 // indirect
