@@ -84,6 +84,7 @@ func main() {
 		log.Printf("Secrets updated")
 	} else {
 		log.Printf("No new secrets to update")
+		os.Exit(0)
 	}
 
 	// Sleep for 5 seconds to allow the secret to propagate
