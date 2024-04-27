@@ -87,10 +87,16 @@ func dbKeysAction(cCtx *cli.Context) error {
 			return fmt.Errorf("The Secret is empty. Please add the DB password first in the Secret with ID: %s", secretID)
 		}
 		// Password could be given through environment variable but if not
-		// then it is the first line of the secret if it not already in the secret
-		if _, exists := secrets[dbPassKey]; !exists && dbPass == "" {
+		// then it is the first line of the secret
+		if dbPass == "" {
 			dbPass = lines[0]
 		}
+	}
+
+	// If the password is in secrets and not in the environment variable
+	// then keep the password from the secret
+	if _, exists := secrets[dbPassKey]; !exists && dbPass != "" {
+		dbPass = secrets[dbPassKey]
 	}
 
 	// Initialize keys
