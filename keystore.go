@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
@@ -10,14 +9,14 @@ import (
 	"time"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
-	"github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v2"
 )
 
 var (
-	keysPath = os.Getenv("KEYS_PATH")
+	keysPath string
 )
 
-func keystoreCMD(ctx context.Context) *cli.Command {
+func keystoreCMD() *cli.Command {
 	cmd := &cli.Command{
 		Name:  "pv-keys",
 		Usage: "Update a Secret Manager secret with Sequencer private keys.",
@@ -27,6 +26,7 @@ func keystoreCMD(ctx context.Context) *cli.Command {
 				Usage:       "Path to the directory containing the .env files with the private keys",
 				Destination: &keysPath,
 				DefaultText: "/keys",
+				EnvVars:     []string{"KEYS_PATH"},
 			},
 		},
 		Action: keystoreAction,
@@ -35,11 +35,8 @@ func keystoreCMD(ctx context.Context) *cli.Command {
 	return cmd
 }
 
-func keystoreAction(ctx context.Context, cmd *cli.Command) error {
-	// Validate required flags
-	if err := validateRequiredOptions(); err != nil {
-		return err
-	}
+func keystoreAction(cCtx *cli.Context) error {
+	ctx := cCtx.Context
 
 	client, err := secretmanager.NewClient(ctx)
 	if err != nil {
