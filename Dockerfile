@@ -23,4 +23,4 @@ WORKDIR /app
 COPY --from=builder /app/bin .
 
 # Command to run the executable
-CMD ["./espresso-keystore-cli"]
+ENTRYPOINT ["./espresso-keystore-cli"]
