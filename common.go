@@ -38,15 +38,3 @@ func updateSecret(ctx context.Context, client *secretmanager.Client, projectID, 
 	}
 	return nil
 }
-
-func validateRequiredOptions() error {
-	var errMsg string
-	if projectID == "" {
-		errMsg += "Project ID is required. "
-	}
-	if secretID == "" {
-		errMsg += "Secret ID is required. "
-	}
-
-	return fmt.Errorf(errMsg)
-}
