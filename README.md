@@ -5,8 +5,12 @@ created by the `ghcr.io/espressosystems/espresso-sequencer/sequencer:main keygen
 
 ## How to use Docker Image
 
+### pv-keys command
+
+> Update a Secret Manager secret with Sequencer private keys.
+
 ```bash
-docker run --rm -it -v $(pwd)/keys:/keys -e KEYS_PATH=/keys -e PROJECT_ID=<GCP Project ID> -e SECRET_ID=<GCP Secret ID> nethermindeth/espresso-keystore-cli:v0.1.1
+docker run --rm -it -v $(pwd)/keys:/keys -e KEYS_PATH=/keys -e PROJECT_ID=<GCP Project ID> -e SECRET_ID=<GCP Secret ID> nethermindeth/espresso-keystore-cli:v0.2.0 pv-keys
 ```
 
 or alternatively, create a `.env` file with the following content:
@@ -20,13 +24,34 @@ SECRET_ID=<GCP Secret ID>
 and run the following command:
 
 ```bash
-docker run --rm -it --env-file .env -v $(pwd)/keys:/keys nethermindeth/espresso-keystore-cli:v0.1.1
+docker run --rm -it --env-file .env -v $(pwd)/keys:/keys nethermindeth/espresso-keystore-cli:v0.2.0 pv-keys
+```
+
+### db-keys
+
+> Update a Secret Manager secret with DB keys.
+
+```bash
+docker run --rm -it nethermindeth/espresso-keystore-cli:v0.2.0 db-keys -p <GCP Project ID> -s <GCP Secret ID> --db-host <DB Host> --db-user <DB User>
+```
+
+or with an .env file:
+
+```text
+SEQUENCER_POSTGRES_HOST=<DB Host>
+SEQUENCER_POSTGRES_USER=<DB User>
+PROJECT_ID=<GCP Project ID>
+SECRET_ID=<GCP Secret ID>
+```
+
+```bash
+docker run --rm -it --env-file .env nethermindeth/espresso-keystore-cli:v0.2.0 db-keys
 ```
 
 ### How to build Docker Image
 
 ```bash
-docker build -t nethermindeth/espresso-keystore-cli:v0.1.1 .
+docker buildx build --platform linux/amd64 -t nethermindeth/espresso-keystore-cli:v0.1.1 .
 ```
 
 ## Example logs

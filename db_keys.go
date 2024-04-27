@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
@@ -9,17 +8,17 @@ import (
 	"time"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
-	"github.com/urfave/cli/v3"
+	"github.com/urfave/cli/v2"
 )
 
 var (
-	dbHost = os.Getenv("SEQUENCER_POSTGRES_HOST")
-	dbUser = os.Getenv("SEQUENCER_POSTGRES_USER")
-	dbPass = os.Getenv("SEQUENCER_POSTGRES_PASS")
+	dbHost string
+	dbUser string
+	dbPass string
 
 	dbHostKey = "ESPRESSO_SEQUENCER_POSTGRES_HOST"
 	dbUserKey = "ESPRESSO_SEQUENCER_POSTGRES_USER"
-	dbPassKey = "ESPRESSO_SEQUENCER_POSTGRES_PASS"
+	dbPassKey = "ESPRESSO_SEQUENCER_POSTGRES_PASSWORD"
 )
 
 type dbKey struct {
@@ -27,7 +26,7 @@ type dbKey struct {
 	Value string
 }
 
-func dbKeysCMD(ctx context.Context) *cli.Command {
+func dbKeysCMD() *cli.Command {
 	cmd := &cli.Command{
 		Name:  "db-keys",
 		Usage: "Update a Secret Manager secret with DB keys.",
@@ -36,16 +35,15 @@ func dbKeysCMD(ctx context.Context) *cli.Command {
 				Name:        "db-host",
 				Usage:       "Database host URL",
 				Destination: &dbHost,
+				EnvVars:     []string{"SEQUENCER_POSTGRES_HOST"},
+				Required:    true,
 			},
 			&cli.StringFlag{
 				Name:        "db-user",
 				Usage:       "Database username",
 				Destination: &dbUser,
-			},
-			&cli.StringFlag{
-				Name:        "db-pass",
-				Usage:       "Database password",
-				Destination: &dbPass,
+				EnvVars:     []string{"SEQUENCER_POSTGRES_USER"},
+				Required:    true,
 			},
 		},
 		Action: dbKeysAction,
@@ -54,27 +52,11 @@ func dbKeysCMD(ctx context.Context) *cli.Command {
 	return cmd
 }
 
-func dbKeysAction(ctx context.Context, cmd *cli.Command) error {
-	// Validate required flags
-	if err := validateRequiredOptions(); err != nil {
-		return err
-	}
-	if dbHost == "" {
-		return fmt.Errorf("Database host URL is required")
-	}
-	if dbUser == "" {
-		return fmt.Errorf("Database username is required")
-	}
-	if dbPass == "" {
-		return fmt.Errorf("Database password is required")
-	}
+func dbKeysAction(cCtx *cli.Context) error {
+	ctx := cCtx.Context
 
-	// Initialize keys
-	keys := []dbKey{
-		{Key: dbHostKey, Value: dbHost},
-		{Key: dbUserKey, Value: dbUser},
-		{Key: dbPassKey, Value: dbPass},
-	}
+	// Its ok if the password is not provided as it could be in the secret
+	dbPass = os.Getenv("SEQUENCER_POSTGRES_PASS")
 
 	client, err := secretmanager.NewClient(ctx)
 	if err != nil {
@@ -97,6 +79,25 @@ func dbKeysAction(ctx context.Context, cmd *cli.Command) error {
 		if keyValue := strings.SplitN(line, "=", 2); len(keyValue) == 2 {
 			secrets[keyValue[0]] = keyValue[1]
 		}
+	}
+
+	// If secrets is empty, then it means it only has the DB password
+	if len(secrets) == 0 {
+		if len(lines) == 0 {
+			return fmt.Errorf("The Secret is empty. Please add the DB password first in the Secret with ID: %s", secretID)
+		}
+		// Password could be given through environment variable but if not
+		// then it is the first line of the secret if it not already in the secret
+		if _, exists := secrets[dbPassKey]; !exists && dbPass == "" {
+			dbPass = lines[0]
+		}
+	}
+
+	// Initialize keys
+	keys := []dbKey{
+		{Key: dbHostKey, Value: dbHost},
+		{Key: dbUserKey, Value: dbUser},
+		{Key: dbPassKey, Value: dbPass},
 	}
 
 	updated := false
