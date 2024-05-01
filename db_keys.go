@@ -95,7 +95,7 @@ func dbKeysAction(cCtx *cli.Context) error {
 
 	// If the password is in secrets and not in the environment variable
 	// then keep the password from the secret
-	if _, exists := secrets[dbPassKey]; !exists && dbPass != "" {
+	if _, exists := secrets[dbPassKey]; exists && dbPass == "" {
 		dbPass = secrets[dbPassKey]
 	}
 
