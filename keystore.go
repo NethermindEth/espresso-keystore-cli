@@ -109,10 +109,10 @@ func keystoreAction(cCtx *cli.Context) error {
 	<-time.After(5 * time.Second)
 
 	// Reload and print final secret contents
-	finalSecretData, err := getSecret(ctx, client, projectID, secretID, "latest")
-	if err != nil {
-		return fmt.Errorf("Failed to access final secret: %v", err)
-	}
-	log.Printf("Final Secret Contents:\n%s", string(finalSecretData))
+	// finalSecretData, err := getSecret(ctx, client, projectID, secretID, "latest")
+	// if err != nil {
+	// 	return fmt.Errorf("Failed to access final secret: %v", err)
+	// }
+	// log.Printf("Final Secret Contents:\n%s", string(finalSecretData))
 	return nil
 }
