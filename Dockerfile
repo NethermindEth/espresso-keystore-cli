@@ -7,8 +7,9 @@ WORKDIR /app
 # Copy the source code into the container
 COPY --link . .
 
-# Build the Go app
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./bin/espresso-keystore-cli
+# Build the Go app with version argument
+ARG VERSION
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags "-X main.Version=${VERSION}" -o ./bin/espresso-keystore-cli
 
 # Final stage
 FROM debian:buster-slim

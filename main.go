@@ -8,7 +8,7 @@ import (
 )
 
 var (
-	version   = "0.2.5"
+	Version   string
 	projectID string
 	secretID  string
 )
@@ -17,7 +17,7 @@ func main() {
 	app := &cli.App{
 		Name:      "Espresso Keystore and Secrets Manager",
 		Usage:     "Update a Secret Manager secret with Sequencer private keys and DB keys.",
-		Version:   version,
+		Version:   Version,
 		Copyright: "(c) 2024 Nethermind",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
